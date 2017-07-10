@@ -1,0 +1,10 @@
+*.egg-info
+.cache
+*.pyc
+htmlcov
+.coverage
+*/wheelhouse
+*.sql
+
+.vscode
+.DS_Store
