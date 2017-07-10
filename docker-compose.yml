@@ -28,8 +28,6 @@ services:
   orders:
     container_name: simplebank-orders
     image: microservicesinaction/simplebank-orders:dev
-    build:
-      context: ./orders
     depends_on:
       - rabbit
       - postgres
