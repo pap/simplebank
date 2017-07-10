@@ -1,8 +1,0 @@
-*.egg-info
-.cache
-*.pyc
-htmlcov
-.coverage
-*/wheelhouse
-*.sql
-.vscode
