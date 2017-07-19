@@ -1,0 +1,49 @@
+version: '2.1'
+services:
+  gateway:
+    image: kong
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: gateway-database
+    links:
+      - gateway-database
+    depends_on:
+      gateway-database:
+        condition: service_healthy
+    ports:
+      - 8000:8000
+      - 8001:8001
+      - 7946:7946
+      - 7946:7946/udp
+      - 8443:8443
+  gateway-database:
+    image: postgres:9.6
+    environment:
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_DB: kong
+      PSQL_TRUST_LOCALNET: 'true'
+      ENCODING: UTF8
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "kong", "-U", "kong"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    restart: on-failure
+    ports:
+      - 5433:5432 # prevent from colliding with local
+  gateway-ui:
+    image: pgbi/kong-dashboard
+    depends_on:
+      gateway:
+        condition: service_started
+    ports:
+      - 8080:8080
+  orders:
+    restart: always
+    build: ./orders
+    ports:
+      - 5000:5000
+    volumes:
+      - /usr/src/app/project/static
+    command: /usr/local/bin/gunicorn -w 2 -b :5000 project:app
