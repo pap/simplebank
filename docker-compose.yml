@@ -39,11 +39,23 @@ services:
         condition: service_started
     ports:
       - 8080:8080
+  account-transactions:
+    restart: always
+    build: ./account_transactions
+    ports:
+      - 5001:5000
+  fees:
+    restart: always
+    build: ./fees
+    ports:
+      - 5002:5000
+  market:
+    restart: always
+    build: ./market
+    ports:
+      - 5003:5000
   orders:
     restart: always
     build: ./orders
     ports:
-      - 5000:5000
-    volumes:
-      - /usr/src/app/project/static
-    command: /usr/local/bin/gunicorn -w 2 -b :5000 project:app
+      - 5004:5000

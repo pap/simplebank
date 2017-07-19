@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    return "Hello from ORDERS SERVICE ..."
+    return "Hello from ACCOUNT TRANSACTIONS SERVICE ..."
 
 
 @app.route("/health")
