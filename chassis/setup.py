@@ -23,16 +23,38 @@ setup(
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3',
         'Topic :: Software Development :: Libraries :: Python Modules',
+
+        "Programming Language :: Python",
+        "Operating System :: MacOS :: MacOS X",
+        "Operating System :: POSIX",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Topic :: Internet",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Intended Audience :: Developers",
     ],
 
     keywords='microservices chassis development',
 
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
-    install_requires=['peppercorn'],
+    install_requires=[
+        'nameko>=2.6.0',
+        'logstash_formatter>=0.5.16',
+        'statsd>=3.2.1',
+        'raven>=6.1.0',
+        "circuitbreaker>=1.0.1",
+        'pyfeatures>=0.1',
+        'request-id>=0.2.1',
+    ],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
