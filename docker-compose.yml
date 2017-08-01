@@ -1,61 +1,118 @@
 version: '2.1'
 services:
-  gateway:
-    image: kong
-    environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: gateway-database
-    links:
-      - gateway-database
-    depends_on:
-      gateway-database:
-        condition: service_healthy
+  rabbitmq:
+    container_name: simplebank-rabbitmq
+    image: rabbitmq:3.6-management
     ports:
-      - 8000:8000
-      - 8001:8001
-      - 7946:7946
-      - 7946:7946/udp
-      - 8443:8443
-  gateway-database:
-    image: postgres:9.6
-    environment:
-    environment:
-      POSTGRES_USER: kong
-      POSTGRES_DB: kong
-      PSQL_TRUST_LOCALNET: 'true'
-      ENCODING: UTF8
-    healthcheck:
-      test: ["CMD", "pg_isready", "-d", "kong", "-U", "kong"]
-      interval: 10s
-      timeout: 3s
-      retries: 10
-    restart: on-failure
+        - "15673:15672" # Exposing RabbitMQ web management on different port for convenience
+    restart: always
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:15672"]
+    #   interval: 10s
+    #   timeout: 3s
+    #   retries: 10
+  redis:
+    container_name: simplebank-redis
+    image: redis
     ports:
-      - 5433:5432 # prevent from colliding with local
-  gateway-ui:
-    image: pgbi/kong-dashboard
+        - "6380:6379" # Exposing Redis on different port for convenience
+    restart: always
+  dd-agent:
+    container_name: simplebank-dd-agent
+    build: ./statsd-agent
+    ports:
+      - 8125:8125
+  demo:
+    container_name: simplebank-demo
+    image: microservicesinaction/simplebank-demo:dev
+    build: ./demo
+    restart: always
+    #command: tail -f /dev/null
     depends_on:
-      gateway:
+      redis:
+        condition: service_started
+      rabbitmq:
         condition: service_started
     ports:
-      - 8080:8080
-  account-transactions:
-    restart: always
-    build: ./account_transactions
-    ports:
-      - 5001:5000
-  fees:
-    restart: always
-    build: ./fees
-    ports:
-      - 5002:5000
-  market:
-    restart: always
-    build: ./market
-    ports:
-      - 5003:5000
-  orders:
-    restart: always
-    build: ./orders
-    ports:
-      - 5004:5000
+        - "8001:8000"
+    links:
+        - "rabbitmq:simplebank-rabbitmq"
+        - "redis:simplebank-redis"
+    environment:
+        REDIS_HOST: "redis"
+        REDIS_PORT: "6379"
+        REDIS_INDEX: "11"
+        RABBIT_PASSWORD: "guest"
+        RABBIT_USER: "guest"
+        RABBIT_HOST: "rabbitmq"
+        RABBIT_PORT: "5672"
+        RABBIT_MANAGEMENT_PORT: "15672"
+  # gateway:
+  #   image: kong
+  #   environment:
+  #     KONG_DATABASE: postgres
+  #     KONG_PG_HOST: gateway-database
+  #   links:
+  #     - gateway-database
+  #   depends_on:
+  #     gateway-database:
+  #       condition: service_healthy
+  #   ports:
+  #     - 8000:8000
+  #     - 8001:8001
+  #     - 7946:7946
+  #     - 7946:7946/udp
+  #     - 8443:8443
+  # gateway-database:
+  #   image: postgres:9.6
+  #   environment:
+  #   environment:
+  #     POSTGRES_USER: kong
+  #     POSTGRES_DB: kong
+  #     PSQL_TRUST_LOCALNET: 'true'
+  #     ENCODING: UTF8
+  #   healthcheck:
+  #     test: ["CMD", "pg_isready", "-d", "kong", "-U", "kong"]
+  #     interval: 10s
+  #     timeout: 3s
+  #     retries: 10
+  #   restart: on-failure
+  #   ports:
+  #     - 5433:5432 # prevent from colliding with local
+  # gateway-ui:
+  #   image: pgbi/kong-dashboard
+  #   depends_on:
+  #     gateway:
+  #       condition: service_started
+  #   ports:
+  #     - 8080:8080
+  # account-transactions:
+  #   restart: always
+  #   build: ./account_transactions
+  #   ports:
+  #     - 5001:5000
+  # fees:
+  #   restart: always
+  #   build: ./fees
+  #   ports:
+  #     - 5002:5000
+  # market:
+  #   restart: always
+  #   build: ./market
+  #   ports:
+  #     - 5003:5000
+  # orders:
+  #   restart: always
+  #   build: ./orders
+  #   ports:
+  #     - 5004:5000
+  # postgres:
+  #   container_name: simplebank-postgres
+  #   image: postgres
+  #   ports:
+  #       - "5433:5432" # Exposing Postgres on different port for convenience
+  #   environment:
+  #       POSTGRES_DB: "orders"
+  #       POSTGRES_PASSWORD: "password"
+  #       POSTGRES_USER: "postgres"
+  #   restart: always
