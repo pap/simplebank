@@ -48,7 +48,6 @@ setup(
         "circuitbreaker>=1.0.1",
         'gutter>=0.5.0',
         'request-id>=0.2.1',
-        'health_check>=3.1.1',
     ],
 
     # List additional groups of dependencies here (e.g. development

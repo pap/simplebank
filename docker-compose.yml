@@ -1,43 +1,43 @@
 version: '2.1'
 services:
-  rabbitmq:
-    container_name: simplebank-rabbitmq
-    image: rabbitmq:3.6-management
-    ports:
-        - "15673:15672" # Exposing RabbitMQ web management on different port for convenience
-    restart: always
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:15672"]
-    #   interval: 10s
-    #   timeout: 3s
-    #   retries: 10
-  redis:
-    container_name: simplebank-redis
-    image: redis
-    ports:
-        - "6380:6379" # Exposing Redis on different port for convenience
-    restart: always
-  dd-agent:
-    container_name: simplebank-dd-agent
-    build: ./statsd-agent
-    ports:
-      - 8125:8125
+  # rabbitmq:
+  #   container_name: simplebank-rabbitmq
+  #   image: rabbitmq:3.6-management
+  #   ports:
+  #       - "15673:15672" # Exposing RabbitMQ web management on different port for convenience
+  #   restart: always
+  #   # healthcheck:
+  #   #   test: ["CMD", "curl", "-f", "http://localhost:15672"]
+  #   #   interval: 10s
+  #   #   timeout: 3s
+  #   #   retries: 10
+  # redis:
+  #   container_name: simplebank-redis
+  #   image: redis
+  #   ports:
+  #       - "6380:6379" # Exposing Redis on different port for convenience
+  #   restart: always
+  # dd-agent:
+  #   container_name: simplebank-dd-agent
+  #   build: ./statsd-agent
+  #   ports:
+  #     - 8125:8125
   demo:
     container_name: simplebank-demo
     image: microservicesinaction/simplebank-demo:dev
     build: ./demo
     restart: always
-    #command: tail -f /dev/null
-    depends_on:
-      redis:
-        condition: service_started
-      rabbitmq:
-        condition: service_started
+    command: tail -f /dev/null
+    # depends_on:
+    #   redis:
+    #     condition: service_started
+    #   rabbitmq:
+    #     condition: service_started
     ports:
         - "8001:8000"
-    links:
-        - "rabbitmq:simplebank-rabbitmq"
-        - "redis:simplebank-redis"
+    # links:
+    #     - "rabbitmq:simplebank-rabbitmq"
+    #     - "redis:simplebank-redis"
     environment:
         REDIS_HOST: "redis"
         REDIS_PORT: "6379"
